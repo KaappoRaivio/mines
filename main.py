@@ -38,6 +38,9 @@ class Mine(object):
     def InitSquare(self):
         kerroin = 10 #muutettava myöhemmmin vastaamaan ikkunan mittoja.
         return [Point(kerroin * self.pos_x, kerroin * self.pos_y), Point(kerroin * self.pos_x + kerroin, kerroin * self.pos_y + kerroin)]
+    def AmountOfNeighbors(self):
+        amount = 0
+        
 
 minefield = MineField(16, 16)
 minefield.Initialize()
