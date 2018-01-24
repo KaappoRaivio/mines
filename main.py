@@ -54,9 +54,12 @@ class MineField(object):
         for x in range(len(self.mines)):
             for y in range(len(self.mines[x])):
                 if self.AmountOfNeighbors(x, y) == 0:
-                    for i in self[x][y].neighbors:
-                        self[i[0], i[1]].is_open = True
-                    self.ClickUnnesessary()
+                    print(moi)
+                    for i in self.mines[x][y].neighbors:
+                        self.mines[i[0]][i[1]].is_open = True
+                        self.ClickUnnesessary()
+                else:
+                    return 0
 class Mine(MineField):
     def __init__(self, pos_x, pos_y, is_flagged, is_open, has_mine, has_exploded):
         self.pos_x = pos_x
