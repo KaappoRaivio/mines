@@ -9,16 +9,24 @@ class MineField(object):
         self.dim_y = dim_y
         self.mines = []
         for i in range(1, dim_x + 1):
-            print(self.dim_y)
             self.mines.append(self.dim_x * [self.dim_y * ''])
 
-        print(self.mines)
     def Initialize(self):
         for i in range(self.dim_x):
             for a in range(self.dim_y):
-                print(i, a)
                 mine = choice([True, False])
                 self.mines[a][i] = (Mine(i, a, False, False, mine))
+
+    def PrintPretty(self):
+        for i in self.mines:
+            row = ''
+            for a in i:
+                if a.has_mine == True:
+                    row += '1'
+                else:
+                    row += '0'
+                row += ' '
+            print(row)
 
 class Mine(object):
     def __init__(self, pos_x, pos_y, is_flagged, is_open, has_mine):
@@ -34,7 +42,8 @@ class Mine(object):
 minefield = MineField(16, 16)
 minefield.Initialize()
 
-for i in minefield.mines:
-    for a in i:
-        print(a.has_mine)
-        print(a.InitSquare())
+# for i in minefield.mines:
+#     for a in i:
+#         print(a.has_mine)
+#         print(a.InitSquare())
+minefield.PrintPretty()
