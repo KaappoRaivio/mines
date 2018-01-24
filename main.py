@@ -8,7 +8,7 @@ class MineField(object):
         self.dim_x = dim_x
         self.dim_y = dim_y
         self.mines = []
-        for i in range(dim_x):
+        for i in range(1, dim_x + 1):
             print(self.dim_y)
             self.mines.append(self.dim_x * [self.dim_y * ''])
 
@@ -18,7 +18,7 @@ class MineField(object):
             for a in range(self.dim_y):
                 print(i, a)
                 mine = choice([True, False])
-                self.mines[i][a] = (Mine(i, a, False, False, mine))
+                self.mines[a][i] = (Mine(i, a, False, False, mine))
 
 class Mine(object):
     def __init__(self, pos_x, pos_y, is_flagged, is_open, has_mine):
@@ -28,11 +28,13 @@ class Mine(object):
         self.is_open = is_open
         self.has_mine = has_mine
     def InitSquare(self):
-        pass
+        kerroin = 10 #muutettava myöhemmmin vastaamaan ikkunan mittoja.
+        return [Point(kerroin * self.pos_x, kerroin * self.pos_y), Point(kerroin * self.pos_x + kerroin, kerroin * self.pos_y + kerroin)]
 
 minefield = MineField(16, 16)
 minefield.Initialize()
-print(minefield.mines)
+
 for i in minefield.mines:
     for a in i:
         print(a.has_mine)
+        print(a.InitSquare())
