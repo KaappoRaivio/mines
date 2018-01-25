@@ -22,6 +22,7 @@ class MineField(object):
             for a in range(self.dim_y):
                 mine = randomMine(number_of_mines, available_space)
                 self.mines[a][i] = (Mine(i, a, False, False, mine, False))
+                print(i, a)
                 available_space -= 1
                 number_of_mines -= 1
 
@@ -34,7 +35,10 @@ class MineField(object):
                     quit = True
                     row += '*'
                 elif a.is_open == True:
-                    row += str(self.AmountOfNeighbors(a.pos_x, a.pos_y))
+                    if self.AmountOfNeighbors(a.pos_x, a.pos_y) == 0:
+                        row += '§'
+                    else:
+                        row += str(self.AmountOfNeighbors(a.pos_x, a.pos_y))
                 else:
                     row += 'O'
                 row += ' '
@@ -50,17 +54,13 @@ class MineField(object):
             if self.mines[i[0]][i[1]].has_mine == True:
                 amount += 1
         return amount
-    def ClickUnnesessary(self, x, y):
-        print(self.mines[x][y].is_open)
-        print(self.AmountOfNeighbors(x, y))
-        if self.AmountOfNeighbors(x, y) == 0 and self.mines[x][y].is_open == True:
-            for i in self.mines[x][y].neighbors:
-                self.mines[i[0]][i[1]].is_open = True
-            for i in self.mines[x][y].neighbors:
-                self.ClickUnnesessary(i[0], i[1])
-                print(self.AmountOfNeighbors(i[0], i[1]))
-        else:
-            return 0
+    def ClickUnnesessary(self):
+        for x in self.mines:
+            for y in x:
+                print(y.pos_x, y.pos_y)
+                if self.AmountOfNeighbors(y.pos_x, y.pos_y) == 0 and y.is_open == True:
+                    for i in y.neighbors:
+                        self.mines[i[0]][i[1]].is_open = True
 class Mine(MineField):
     def __init__(self, pos_x, pos_y, is_flagged, is_open, has_mine, has_exploded):
         self.pos_x = pos_x
@@ -110,4 +110,4 @@ while True:
         minefield.mines[guess[1]][guess[0]].is_open = True
     else:
         minefield.mines[guess[1]][guess[0]].has_exploded = True
-    minefield.ClickUnnesessary(guess[1], guess[0])
+    minefield.ClickUnnesessary()
