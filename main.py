@@ -50,16 +50,17 @@ class MineField(object):
             if self.mines[i[0]][i[1]].has_mine == True:
                 amount += 1
         return amount
-    def ClickUnnesessary(self):
-        for x in range(len(self.mines)):
-            for y in range(len(self.mines[x])):
-                if self.AmountOfNeighbors(x, y) == 0:
-                    print(moi)
-                    for i in self.mines[x][y].neighbors:
-                        self.mines[i[0]][i[1]].is_open = True
-                        self.ClickUnnesessary()
-                else:
-                    return 0
+    def ClickUnnesessary(self, x, y):
+        print(self.mines[x][y].is_open)
+        print(self.AmountOfNeighbors(x, y))
+        if self.AmountOfNeighbors(x, y) == 0 and self.mines[x][y].is_open == True:
+            for i in self.mines[x][y].neighbors:
+                self.mines[i[0]][i[1]].is_open = True
+            for i in self.mines[x][y].neighbors:
+                self.ClickUnnesessary(i[0], i[1])
+                print(self.AmountOfNeighbors(i[0], i[1]))
+        else:
+            return 0
 class Mine(MineField):
     def __init__(self, pos_x, pos_y, is_flagged, is_open, has_mine, has_exploded):
         self.pos_x = pos_x
@@ -71,26 +72,19 @@ class Mine(MineField):
         self.neighbors = [[self.pos_x + 1, self.pos_y], [self.pos_x + 1, self.pos_y + 1], [self.pos_x, self.pos_y + 1], [self.pos_x - 1, self.pos_y + 1 ], [self.pos_x - 1, self.pos_y], [self.pos_x - 1, self.pos_y - 1], [self.pos_x, self.pos_y - 1], [self.pos_x + 1, self.pos_y - 1]]
         to_be_removed = []
         for i in range(len(self.neighbors)):
-            print(self.neighbors[i])
-            print(i)
             for a in self.neighbors[i]:
-                #print(a)
                 if a > 15 or a < 0:
-                    #print(self.neighbors[i])
                     to_be_removed.append(self.neighbors[i])
-                    print('moi')
                     break
-        print(to_be_removed)
         for i in to_be_removed:
             self.neighbors.remove(i)
-        print(self.neighbors)
     def InitSquare(self):
         kerroin = 10 #muutettava myöhemmmin vastaamaan ikkunan mittoja.
         return [Point(kerroin * self.pos_x, kerroin * self.pos_y), Point(kerroin * self.pos_x + kerroin, kerroin * self.pos_y + kerroin)]
 
 
 minefield = MineField(16, 16)
-minefield.Initialize(150)
+minefield.Initialize(10)
 # for i in minefield.mines:
 #     for a in i:
 #         print(a.has_mine)
@@ -106,7 +100,7 @@ while True:
     try:
         for i in range(len(guess)):
             guess[i] = int(guess[i]) - 1
-    except ValueError:
+    except:
         print('Inputti ei kelpaa!!!')
     print(guess)
     if not minefield.mines[guess[1]][guess[0]].has_mine:
@@ -116,4 +110,4 @@ while True:
         minefield.mines[guess[1]][guess[0]].is_open = True
     else:
         minefield.mines[guess[1]][guess[0]].has_exploded = True
-    minefield.ClickUnnesessary()
+    minefield.ClickUnnesessary(guess[1], guess[0])
