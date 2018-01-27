@@ -10,6 +10,19 @@ class MineField(object):
         self.mines = []
         for i in range(1, dim_x + 1):
             self.mines.append(self.dim_x * [self.dim_y * ''])
+    def __str__(self):
+        temp_string = ''
+        for x in self.mines:
+            for y in x:
+                if y.has_exploded:
+                    temp_string += '*'
+                elif y.is_open:
+                    temp_string += str(self.AmountOfNeighbors(x, y))
+                else:
+                    temp_string += 'O'
+                temp_string += ' '
+            temp_string += '\n'
+        return temp_string
 
     def Initialize(self, number_of_mines):
         def randomMine(number_of_mines, amount_of_space):
@@ -21,31 +34,10 @@ class MineField(object):
         for i in range(self.dim_x):
             for a in range(self.dim_y):
                 mine = randomMine(number_of_mines, available_space)
-                self.mines[a][i] = (Mine(i, a, False, False, mine, False))
+                self.mines[a][i] = (Mine(i, a, False, False, False, mine, False))
                 print(i, a)
                 available_space -= 1
                 number_of_mines -= 1
-
-    def PrintPretty(self):
-        quit = False
-        for i in self.mines:
-            row = ''
-            for a in i:
-                if a.has_exploded == True:
-                    quit = True
-                    row += '*'
-                elif a.is_open == True:
-                    if self.AmountOfNeighbors(a.pos_x, a.pos_y) == 0:
-                        row += '§'
-                    else:
-                        row += str(self.AmountOfNeighbors(a.pos_x, a.pos_y))
-                else:
-                    row += 'O'
-                row += ' '
-            print(row)
-        if quit:
-            print('Hävisit pelin!')
-            return -1
 
 
     def AmountOfNeighbors(self, x, y):
@@ -53,19 +45,23 @@ class MineField(object):
         for i in self.mines[x][y].neighbors:
             if self.mines[i[0]][i[1]].has_mine == True:
                 amount += 1
+        #print(amount)
         return amount
     def ClickUnnesessary(self):
         for x in self.mines:
             for y in x:
-                print(y.pos_x, y.pos_y)
-                if self.AmountOfNeighbors(y.pos_x, y.pos_y) == 0 and y.is_open == True:
+                #print(y.pos_x, y.pos_y)
+                if y.is_open:
+                    print('terve')
+                if not self[x][y].has_mine and y.is_open == True:
                     for i in y.neighbors:
                         self.mines[i[0]][i[1]].is_open = True
 class Mine(MineField):
-    def __init__(self, pos_x, pos_y, is_flagged, is_open, has_mine, has_exploded):
+    def __init__(self, pos_x, pos_y, is_flagged, is_opening_pending, is_open, has_mine, has_exploded):
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.is_flagged = is_flagged
+        self.is_opening_pending = is_opening_pending
         self.is_open = is_open
         self.has_mine = has_mine
         self.has_exploded = has_exploded
@@ -84,19 +80,17 @@ class Mine(MineField):
 
 
 minefield = MineField(16, 16)
-minefield.Initialize(10)
+minefield.Initialize(100)
 # for i in minefield.mines:
 #     for a in i:
 #         print(a.has_mine)
 #         print(a.InitSquare())
-minefield.PrintPretty()
 
 first_run = True
 
 while True:
-    if minefield.PrintPretty() == -1:
-        break
-    guess = input('Arvauksesi (muotoa \"<x>, <y>\"):').split(', ')
+    print(minefield)
+    guess = input('Arvauksesi (muotoa \"<x>, <y>\"):').split(' ')
     try:
         for i in range(len(guess)):
             guess[i] = int(guess[i]) - 1
@@ -110,4 +104,8 @@ while True:
         minefield.mines[guess[1]][guess[0]].is_open = True
     else:
         minefield.mines[guess[1]][guess[0]].has_exploded = True
+    for x in minefield.mines:
+        for y in x:
+            if y.is_open:
+                print(y.has_mine)
     minefield.ClickUnnesessary()
