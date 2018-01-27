@@ -17,10 +17,18 @@ class MineField(object):
                 if y.has_exploded:
                     temp_string += '*'
                 elif y.is_open:
-                    temp_string += str(self.AmountOfNeighbors(x, y))
+                    temp_string += str(self.AmountOfNeighbors(y.pos_x, y.pos_y))
                 else:
                     temp_string += 'O'
                 temp_string += ' '
+            temp_string += ' '
+            for y in x:
+                if y.has_mine:
+                    temp_string += 'X'
+                else:
+                    temp_string += 'O'
+                temp_string += ' '
+
             temp_string += '\n'
         return temp_string
 
@@ -35,7 +43,7 @@ class MineField(object):
             for a in range(self.dim_y):
                 mine = randomMine(number_of_mines, available_space)
                 self.mines[a][i] = (Mine(i, a, False, False, False, mine, False))
-                print(i, a)
+                #print(i, a)
                 available_space -= 1
                 number_of_mines -= 1
 
@@ -53,7 +61,7 @@ class MineField(object):
                 #print(y.pos_x, y.pos_y)
                 if y.is_open:
                     print('terve')
-                if not self[x][y].has_mine and y.is_open == True:
+                if self.AmountOfNeighbors(y.pos_x, y.pos_y) == 0 and y.is_open == True:
                     for i in y.neighbors:
                         self.mines[i[0]][i[1]].is_open = True
 class Mine(MineField):
@@ -104,6 +112,10 @@ while True:
         minefield.mines[guess[1]][guess[0]].is_open = True
     else:
         minefield.mines[guess[1]][guess[0]].has_exploded = True
+        print(minefield)
+        print('Hävisit pelin!')
+        quit()
+    first_run = False
     for x in minefield.mines:
         for y in x:
             if y.is_open:
