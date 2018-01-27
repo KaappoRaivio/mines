@@ -14,10 +14,15 @@ class MineField(object):
         temp_string = ''
         for x in self.mines:
             for y in x:
-                if y.has_exploded:
+                if y.is_flagged:
+                    temp_string += 'F'
+                elif y.has_exploded:
                     temp_string += '*'
                 elif y.is_open:
-                    temp_string += str(self.AmountOfNeighbors(y.pos_x, y.pos_y))
+                    if str(self.AmountOfNeighbors(y.pos_x, y.pos_y)) == 0:
+                        temp_string += '<'
+                    else:
+                        temp_string += str(self.AmountOfNeighbors(y.pos_x, y.pos_y))
                 else:
                     temp_string += 'O'
                 temp_string += ' '
@@ -33,6 +38,7 @@ class MineField(object):
         return temp_string
 
     def Initialize(self, number_of_mines):
+        mine_count = 0
         def randomMine(number_of_mines, amount_of_space):
             if random() < number_of_mines / amount_of_space:
                 return True
@@ -42,11 +48,12 @@ class MineField(object):
         for i in range(self.dim_x):
             for a in range(self.dim_y):
                 mine = randomMine(number_of_mines, available_space)
+                mine_count += int(mine)
                 self.mines[a][i] = (Mine(i, a, False, False, False, mine, False))
                 #print(i, a)
                 available_space -= 1
-                number_of_mines -= 1
-
+                number_of_mines -= int(mine)
+        print(mine_count)
 
     def AmountOfNeighbors(self, x, y):
         amount = 0
@@ -98,26 +105,34 @@ first_run = True
 
 while True:
     print(minefield)
+    user_trying_to_flag_mine = False
     guess = input('Arvauksesi (muotoa \"<x>, <y>\"):').split(' ')
+    if guess[0].lower() == 'f':
+        user_trying_to_flag_mine = True
+        guess = guess[1:]
+
     try:
         for i in range(len(guess)):
             guess[i] = int(guess[i]) - 1
     except:
         print('Inputti ei kelpaa!!!')
-    print(guess)
+    if user_trying_to_flag_mine:
+        minefield.mines[guess[1]][guess[0]].is_flagged = not minefield.mines[guess[1]][guess[0]].is_flagged
+        first_run = False
+        continue
     if not minefield.mines[guess[1]][guess[0]].has_mine:
         minefield.mines[guess[1]][guess[0]].is_open = True
+
     elif first_run:
         minefield.mines[guess[1]][guess[0]].has_mine = False
         minefield.mines[guess[1]][guess[0]].is_open = True
+
     else:
         minefield.mines[guess[1]][guess[0]].has_exploded = True
         print(minefield)
         print('Hävisit pelin!')
         quit()
+
     first_run = False
-    for x in minefield.mines:
-        for y in x:
-            if y.is_open:
-                print(y.has_mine)
+
     minefield.ClickUnnesessary()
