@@ -19,7 +19,7 @@ class MineField(object):
                 elif y.has_exploded:
                     temp_string += '*'
                 elif y.is_open:
-                    if str(self.AmountOfNeighbors(y.pos_x, y.pos_y)) == 0:
+                    if self.AmountOfNeighbors(y.pos_x, y.pos_y) == 0:
                         temp_string += '<'
                     else:
                         temp_string += str(self.AmountOfNeighbors(y.pos_x, y.pos_y))
@@ -69,7 +69,10 @@ class MineField(object):
                 if y.is_open:
                     print('terve')
                 if self.AmountOfNeighbors(y.pos_x, y.pos_y) == 0 and y.is_open == True:
+                    print('hei')
                     for i in y.neighbors:
+                        if self.mines[i[0]][i[1]].has_mine:
+                            print('Ongelma')
                         self.mines[i[0]][i[1]].is_open = True
 class Mine(MineField):
     def __init__(self, pos_x, pos_y, is_flagged, is_opening_pending, is_open, has_mine, has_exploded):
@@ -95,7 +98,7 @@ class Mine(MineField):
 
 
 minefield = MineField(16, 16)
-minefield.Initialize(100)
+minefield.Initialize(40)
 # for i in minefield.mines:
 #     for a in i:
 #         print(a.has_mine)
