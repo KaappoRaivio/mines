@@ -1,7 +1,8 @@
-from graphics import *
+import graphics
 from random import random
 
 # win = GraphWin('Mines', 720, 576)
+
 
 class MineField(object):
 
@@ -73,18 +74,20 @@ class MineField(object):
         return amount
 
     def ClickUnnesessary(self):
+        work_done = 0
         for x in self.mines:
             for y in x:
-                # print(y.pos_x, y.pos_y)
-                if y.is_open:
-                    print('terve')
-                if self.AmountOfNeighbors(y.pos_x, y.pos_y) is 0 and y.is_open is True:
-                    print(y.neighbors)
-                    print(self)
+                if not self.AmountOfNeighbors(y.pos_x, y.pos_y):
+                    self.no_neighbors = True
+                    work_done += 1
+        for x in self.mines:
+            for y in x:
+                if y.is_open and y.no_neighbors:
                     for i in y.neighbors:
-                        if self.GetMine(i[0], i[1]).has_mine:
-                            print('Ongelma')
                         self.GetMine(i[0], i[1]).is_open = True
+        print(work_done)
+
+
 class Mine(MineField):
     def __init__(self, pos_x, pos_y, is_flagged, is_opening_pending, is_open, has_mine, has_exploded):
         self.pos_x = pos_x
@@ -94,6 +97,7 @@ class Mine(MineField):
         self.is_open = is_open
         self.has_mine = has_mine
         self.has_exploded = has_exploded
+        self.no_neighbors = False
         self.neighbors = [[self.pos_x + 1, self.pos_y],
                           [self.pos_x + 1, self.pos_y + 1],
                           [self.pos_x, self.pos_y + 1],
@@ -101,20 +105,20 @@ class Mine(MineField):
                           [self.pos_x - 1, self.pos_y],
                           [self.pos_x - 1, self.pos_y - 1],
                           [self.pos_x, self.pos_y - 1],
-                          [self.pos_x + 1, self.pos_y - 1]]
+                          [self.pos_x + 1, self.pos_y - 1],
+                          [self.pos_x, self.pos_y]]
         to_be_removed = []
         for i in range(len(self.neighbors)):
-            for a in self.neighbors[i]:
-                if a > 15 or a < 0:
+            for a in range(len(self.neighbors[i])):
+                if not -1 < self.neighbors[i][a] < 16:
                     to_be_removed.append(self.neighbors[i])
                     break
         for i in to_be_removed:
             self.neighbors.remove(i)
 
     def InitSquare(self):
-
-        kerroin = 10 # muutettava myöhemmmin vastaamaan ikkunan mittoja.
-        return [Point(kerroin * self.pos_x, kerroin * self.pos_y), Point(kerroin * self.pos_x + kerroin, kerroin * self.pos_y + kerroin)]
+        kerroin = 10  # muutettava myöhemmmin vastaamaan ikkunan mittoja.
+        return [graphics.Point(kerroin * self.pos_x, kerroin * self.pos_y), graphics.Point(kerroin * self.pos_x + kerroin, kerroin * self.pos_y + kerroin)]
 
 
 minefield = MineField(16, 16)
@@ -125,9 +129,9 @@ minefield.Initialize(40)
 #         print(a.InitSquare())
 
 first_run = True
+print(minefield)
 
 while True:
-    print(minefield)
     user_trying_to_flag_mine = False
     guess = input('Arvauksesi (muotoa \"<x> <y>\"):').split(' ')
     if guess[0].lower() == 'f':
@@ -140,19 +144,20 @@ while True:
     except:
         print('Inputti ei kelpaa!!!')
         continue
+
     if user_trying_to_flag_mine:
         minefield.GetMine(guess[1], guess[0]).is_flagged = not minefield.mines[guess[1]][guess[0]].is_flagged
         first_run = False
-        minefield.ClickUnnesessary()
         continue
-    if not minefield.mines[guess[1]][guess[0]].has_mine:
+    elif not minefield.mines[guess[1]][guess[0]].has_mine:  # Ei ole miinaa
         minefield.GetMine(guess[1], guess[0]).is_open = True
+        print('hei')
 
-    elif first_run:
+    elif first_run:  # Oli miina, mutta eka runni joten miina poistuu
         minefield.GetMine(guess[1], guess[0]).has_mine = False
         minefield.Getmine(guess[1], guess[0]).is_open = True
 
-    else:
+    else:  # Räjähti
         minefield.GetMine(guess[1], guess[0]).has_exploded = True
         print(minefield)
         print('Hävisit pelin!')
@@ -161,3 +166,4 @@ while True:
     first_run = False
 
     minefield.ClickUnnesessary()
+    print(minefield)
